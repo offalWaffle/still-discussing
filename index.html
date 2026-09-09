@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Still Discussing</title>
+<meta name="description" content="A generator of delay excuses in the voice of a perpetually-postponed corporate funding update.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --cream: #f6f2ea;
+    --beige: #ece5da;
+    --ink: #211e1b;
+    --muted: #948e84;
+    --lavender: #b9a6f4;
+    --lavender-hover: #ab94f1;
+    --coral: #e97c6e;
+    --line: #e3dccf;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Poppins", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  img { max-width: 100%; }
+
+  .wrap { width: 100%; max-width: 600px; }
+
+  .card {
+    background: var(--beige);
+    border-radius: 14px;
+    padding: 32px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .tag {
+    align-self: flex-start;
+    background: var(--coral);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .005em;
+    padding: 7px 15px;
+    border-radius: 8px;
+  }
+
+  .excuse {
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.42;
+    letter-spacing: -.012em;
+    margin: 0;
+    min-height: 3.9em;
+    display: flex;
+    align-items: center;
+    text-wrap: pretty;
+  }
+
+  .btn {
+    align-self: flex-start;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: -.005em;
+    color: var(--ink);
+    background: var(--lavender);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 28px;
+    cursor: pointer;
+    transition: background .15s, transform .08s;
+  }
+  .btn:hover { background: var(--lavender-hover); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .enter { animation: enter .4s cubic-bezier(.2,.7,.3,1); }
+  @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) { .enter { animation: none; } }
+  @media (max-width: 480px) {
+    .card { padding: 24px 22px 22px; }
+    .excuse { font-size: 19px; min-height: 4.6em; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card">
+      <span class="tag">No news yet</span>
+      <p class="excuse" id="excuse"></p>
+      <button class="btn" id="gen">Generate the next excuse</button>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+
+    var excuses = [
+    "We're one signature short of the 75%, and the missing signer is somewhere over the Atlantic with, we're assured, every intention of signing on landing.",
+    "The DocuSign went out this morning to all shareholders; it has been opened by everyone except the one whose signature we actually need.",
+    "The special resolution is signed bar a single holdout, who has read it twice, said it looks fine, and then boarded a flight.",
+    "Two of three signatures are in — the third signer confirmed by text that they're 'basically at a laptop', which was some hours ago now.",
+    "The travelling shareholder has landed, replied to say they've landed, and gone quiet on the actual matter of signing.",
+    "We need one more signature to clear the super-majority, and the person holding it has now been described as 'mid-transit' for two working days.",
+    "The resolution requires 75%, we are at roughly 74%, and the remaining 1% is currently at a wedding with its phone off.",
+    "The final signer wants a quick call before signing, and the quick call keeps being rescheduled to accommodate their other quick calls.",
+    "Everyone has signed except the shareholder we can't reach, who is, as ever, the whole point.",
+    "The wet-ink page is somewhere between a solicitor's office and a signatory who is, at time of writing, on a train with no table.",
+    "Hoxton's counsel flagged a point on Friday that everyone believed was closed on Thursday, so it has gone back to the principals for what I make the fourth time.",
+    "TPC will convert their debt to equity, but only in the version of the plan where they don't put in fresh capital, which is not, it emerges, the current version.",
+    "Hoxton have decided to re-run their internal risk assessment on funding the business with $15M, an assessment they have now re-run more than once.",
+    "The deal is agreed in principle — the same principle it was agreed on three weeks ago, before the principle was reopened.",
+    "TPC and Hoxton are aligned on everything except the one number that the entire thing turns on.",
+    "Hussein has said Hoxton intend to fund; Hussein has also not yet done the specific thing that would constitute funding.",
+    "The equity stake TPC would hold after converting their debt is the single outstanding point, as it has been the single outstanding point for some weeks.",
+    "Hoxton want a co-investor lined up before they release, the co-investor wants Hoxton to release before they commit, and here we are.",
+    "Edge pulled out, Creativ came in, Creativ went quiet, and the gap where the money should be remains encouragingly consistent.",
+    "The term sheet has been signed by TPC and is awaiting Hoxton, who signed the last one and are, we're told, minded to sign this one too.",
+    "The wire is genuinely ready this time — it's simply waiting on the shareholder who's been airborne since the last time we said the wire was ready.",
+    "The funds have to sit on account with a solicitor first, a step that exists specifically so that we can be very close to the money without having it.",
+    "We've missed today's CHAPS cut-off by a margin that is, in the scheme of a nine-week wait, almost poetic.",
+    "The bank has flagged a payment of this size for an extra check, presumably having noticed it is the first one in a while.",
+    "Hoxton have confirmed the wire is ready pending all approvals and signatures, which is another way of saying the wire is not ready.",
+    "The remittance is queued behind a compliance review that could clear tonight or, on precedent, could not.",
+    "The transfer went out, bounced on a reference mismatch, and is being resent with the correct reference and the original delay.",
+    "The administrators need the budget approved by Friday, the budget needs TPC by Thursday, and TPC need a call that keeps moving for the West Coast.",
+    "We can't file until a representative of TPC signs in front of a solicitor, and the representative is, naturally, on the West Coast.",
+    "The Notice of Intent has lapsed, and we can't refile it because refiling requires a settled intent, which is the one thing nobody currently has.",
+    "The filing window is 10am to 4pm on weekdays, and today's window has closed with the calm inevitability of all the previous ones.",
+    "RSM are drafting the plan so that it adheres to the various processes required, which is reassuring and also why it isn't here yet.",
+    "The board followed the insolvency practitioner's written advice not to file today, on the grounds that filing today would make everyone marginally worse off.",
+    "The administrators are speaking directly with Hoxton daily, a cadence we are told is progress and are choosing to believe.",
+    "The investment committee is broadly supportive but doesn't formally sit until a day that keeps arriving without the committee in it.",
+    "It's been approved subject to conditions that are themselves still being drafted, so the approval is real but not yet load-bearing.",
+    "The board call reached alignment last night, subject only to the small matter of the alignment surviving until morning, which it has not.",
+    "TPC's committee won't meet before West Coast afternoon, and West Coast afternoon is a time that, for our purposes, may as well be theoretical.",
+    "Two committee members are travelling, so the vote that unblocks everything is deferred to a quorum that keeps travelling.",
+    "New counsel has been brought in, which is either a fresh pair of eyes or a fresh set of comments on the documents we thought were finished.",
+    "The docs went through several back-and-forth reviews between the parties and have emerged, remarkably, still not signed.",
+    "The IP legal opinion is coming from a US attorney reviewing it under US law, a sentence containing at least three separate reasons for delay.",
+    "A definition three schedules deep needs tightening, and tightening it has reopened the two schedules on either side.",
+    "The engrossment is being prepared, a word I have learned recently and which appears to mean 'nearly, but not today'.",
+    "Counsel wants one more warranty before release, the other side wants one fewer, and the deal sits precisely one warranty apart.",
+    "Roland is mid-flight chasing the principals from the air, which is either deeply reassuring or a metaphor, depending on the hour.",
+    "Corey was at a memorial service somewhere in remote Vermont where, it turned out, the internet does not reach, and so neither did the update.",
+    "The one person who can authorise the payment is on paternity leave, and no one, in nine weeks, thought to arrange a delegate.",
+    "The MacBook with the signing certificate is, we believe, still with a former colleague, who is himself difficult to reach.",
+    "The approver replied 'will do' on Tuesday and has since achieved a silence of genuinely impressive completeness.",
+    "Whether this tranche covers July, or July and August, is being confirmed, and 'being confirmed' is doing a great deal of work in that sentence.",
+    "The payroll file is cut, checked and sitting with the bank; all it lacks is the funding, which is all it has ever lacked.",
+    "The provider has, once again, prepared the payslips, and once again been asked to hold them until the money that would justify them arrives.",
+    "Net pay is calculated to the penny; the penny, and all the pennies behind it, are the subject of a separate and ongoing negotiation.",
+    "The call is timed to catch London and the West Coast simultaneously, a window so narrow that missing it has become a weekly tradition.",
+    "The meeting moved to accommodate a key attendee, who has since become unavailable for the new time as well.",
+    "We're waiting for New York to come online, then for New York to have opinions, then for those opinions to reach California.",
+    "It's still the middle of the night where the decision sits, and the decision, considerately, is sleeping.",
+    "Nothing has materially changed since this morning, but the parties are still talking, which we are contractually obliged to describe as positive.",
+    "We remain cautiously hopeful, the operative word being 'cautiously', the load-bearing one being 'remain'.",
+    "It's in the grey zone — the specific grey zone we have now been in long enough to have furnished.",
+    "Not dead yet, and we are, as always, using what leverage we have, which is roughly the leverage of asking nicely.",
+    "There is genuine will on all sides to do this, and genuine inability, so far, to actually do it.",
+    "The direction of travel is positive; the speed of travel is, candidly, not.",
+    "We're a signature and a wire away, exactly as we were a fortnight ago, when we were also a signature and a wire away.",
+    "Things are moving in the background that we can't yet detail, a phrase I recognise carries less weight each time I use it.",
+    "We expect to know more once the US wakes up, a hope we have now attached to several consecutive US mornings.",
+    "It's a question of when, not if — though the 'when' has shown a range wide enough to accommodate almost any answer.",
+    "It was due Friday, then Monday, then midweek, and is now expected 'imminently', a word we have collectively stopped trusting.",
+    "The hard deadline held, technically, in that it passed on schedule without anything else happening.",
+    "Best case is tonight; the more experienced case is first thing tomorrow; the historical case is next week.",
+    "We've asked for a firm time and have, in response, been given a firm assurance that a firm time is coming.",
+    "It should land any day now, a statement that has the advantage of being, in the long run, unfalsifiable.",
+    "The wax for the seal has, believe it or not, run out, and the replacement wax is on a delivery that is also delayed.",
+    "The lead is on a silent retreat and reachable, we are told, only by fax, which raises questions we've decided not to ask.",
+    "A typo in the sort code sent the test payment somewhere it has yet to return from, so we're now waiting on money we never had.",
+    "Autocorrect changed a name on the execution copy, so the whole thing is being reissued to a person who does, in fact, exist.",
+    "The final sign-off is waiting on someone's lunch to finish, a lunch that has, over the afternoon, acquired real geopolitical weight.",
+    "The board portal has locked everyone out, and support have opened a ticket, which will presumably now also require approval.",
+    "The one laptop that opens the file is in for repair, and the repair, in the spirit of the week, is running long.",
+    "Hoxton are reviewing the capital needs afresh, having reviewed them before, in case the number changed while nobody was funding anything.",
+    "The plan now hinges on Hoxton bringing in a new investor within twelve months, a plan that is really just this plan with more waiting attached.",
+    "There is one outstanding issue on the deal points, and there is always, reliably, exactly one outstanding issue on the deal points.",
+    "The parties have arrived at a deal, subject to the parties continuing to agree that they have arrived at a deal.",
+    "Hoxton's lead had not realised a point was still open until his own counsel raised it, at which stage it stopped being closed.",
+    "A statutory demand is quietly running its 21 days in the background, adding a deadline we didn't choose to the ones we can't meet.",
+    "HMRC's position is being clarified, and HMRC, unlike everyone else in this saga, does not need to issue a statutory demand first.",
+    "The security has to be registered before funds are advanced, another of the small necessary steps that together comprise the delay.",
+    "A consent under an existing loan is required, from a party who has not, historically, hurried.",
+    "The intercreditor deed is the last document being negotiated, and 'last document' has proven to be a rolling honorific.",
+    "We're pushing at every level we can reach, and have discovered, over nine weeks, precisely how many levels that is.",
+    "No news is, at the very least, not bad news, which is the standard to which we have quietly lowered ourselves.",
+    "The mood on the call was constructive, for whatever a constructive mood is now worth against an outstanding wire.",
+    "We're closer than we were yesterday, by a margin too small to bank and too real to ignore.",
+    "The parties are aligned in spirit, if not yet in the specific documents that would make the spirit count.",
+    "We've done our part; the remaining parts belong to people whose parts have historically taken a while.",
+    "The revised timeline lands it by Friday, in much the way the previous revised timeline landed it by the previous Friday.",
+    "It's imminent in the particular, well-established sense in which everything here is always imminent.",
+    "We'll have something concrete after the next call, the next call being the natural home of all our concrete things.",
+    "The signer's phone died at the decisive moment, which is either bad luck or the universe maintaining its theme.",
+    "Their treasury team need a second authoriser for a sum this size, and the second authoriser is, with grim predictability, away.",
+    "The FX conversion is being arranged before the sterling amount lands, adding an exchange rate to the list of things we are waiting on.",
+    "A cross-border transfer means an extra day for correspondent banking, an extra day that arrives on top of the several we already have.",
+    "The capital call has gone out to Hoxton's LPs and takes about ten days, ten days we are experiencing one at a time.",
+    "The GP needs LP consent for a cheque this size, consent that is being sought with a diligence indistinguishable, from here, from delay.",
+    "The fund is between vintages, so the money is real but not, this precise week, reachable.",
+    "The valuation is being refreshed before the round can close, because the one thing this process needed was another number to agree.",
+    "The going-concern note is being reworded with the auditors, a task whose irony is not lost on anyone drafting it.",
+    "Companies House filings have to be brought up to date first, so the delay now has a small, bureaucratic delay of its own.",
+    "The cap table needs reconciling before new shares can issue, and reconciling it has revealed exactly the discrepancy you'd expect.",
+    "The person with the password left last week and did not, in leaving, hand it over, so the account is secure from everyone including us.",
+    "The key contact is on jury service until further notice, and 'until further notice' is a phrase we're all now fluent in.",
+    "Someone approved the wrong version, so we're establishing which version is the right version before approving that one too.",
+    "The confirmation email went to a spam folder no one checks, and was found only once we'd already assumed the worst.",
+    "The relevant meeting was double-booked against the all-hands, and lost, as these things do, to the larger calendar.",
+    "The stamp we need is in a drawer in an office none of us can currently get into, the office being part of what's at stake.",
+    "The approver is 'just finishing something', and has been just finishing something for the better part of the working day.",
+    "The scheduling assistant put everyone in different calendars, so the call that unblocks the wire is currently three separate calls.",
+    "This isn't coming in as a bridge loan, so it needs a special resolution, which is why we are once again counting to 75%.",
+    "The first tranche is meant to cover July and August, though which months it covers remains, thrillingly, an open question.",
+    "A backstop is being lined up before the lead will release, and the backstop, sensibly, wants to see the lead release first.",
+    "The option pool size is the last point of negotiation, the deal having worked methodically through every point that isn't.",
+    "A side letter is being drafted before they'll commit the first tranche, because the main letter, apparently, was not enough letters.",
+    "The board's written consent is circulating for the final two signatures, circulating being what documents do here instead of completing.",
+    "We're waiting on the countersigned term sheet, a document currently enjoying a leisurely round trip between two sets of lawyers.",
+    "The completion checklist has three items open, the same three items, viewed now with something close to affection.",
+    "Everything is agreed except the effective date, which is, when you think about it, the one date this all depends on.",
+    "The disbursement is scheduled in the system but not yet authorised, scheduled and authorised being separated by exactly the gap we keep falling into.",
+    "The lead asked for 24 hours to consult a partner, and those 24 hours are now, by my count, closer to 48.",
+    "A power of attorney is being arranged for the absent signatory, so that their absence can, at last, stop being load-bearing.",
+    "The witnessing has to be done in person, and the diaries required to be in the same room do not align until Friday.",
+    "The notary appointment couldn't be booked before Thursday, adding a professional we'd never heard of to the list of people we now wait on.",
+    "The change of control triggers a consent we're still chasing, from a counterparty who did not build their reputation on speed.",
+    "Two-factor authentication is failing on the single account able to authorise the release, locking us out of our own good news.",
+    "The DocuSign portal is down for scheduled maintenance until this evening, the one deadline in this entire process reliably met by a website.",
+    "Storms have grounded the flight our signer was booked on, so the weather has now joined the negotiation.",
+    "Procurement froze new spend and swept this up with it, so the payment is blocked by a control designed to protect the money we don't have.",
+    "The supplier onboarding for the new entity isn't complete, meaning the company cannot yet pay itself, which feels significant.",
+    "Finance is mid-month-end close and won't release anything until it reopens, and month-end, unlike our deal, keeps firmly to its schedule.",
+    "We're told first thing tomorrow, by the same people, in the same words, who told us first thing today.",
+    "The last shareholder has printed the resolution, which we're treating as momentum, and has not yet signed it, which we're treating as Thursday's problem.",
+    "The signature we need is with a shareholder who is 'travelling for work', a status that has now outlasted most actual jobs.",
+    "The signer says they'll do it from the lounge before boarding, and the lounge, the boarding and the doing remain, for now, hypothetical.",
+    "We have every signature except the one belonging to the person the others are, understandably, waiting to see move first.",
+    "The final approval is a formality, in the sense that formalities here take between one afternoon and the rest of the month.",
+    "The shareholder has agreed verbally, enthusiastically, and repeatedly, and has agreed in writing not at all.",
+    "The DocuSign reminder has been sent, re-sent, and then sent by a human being who typed it out personally, to no observable effect.",
+    "The signatory is in the air with intermittent Wi-Fi, so the resolution is being signed, in theory, at roughly 500 miles an hour.",
+    "One shareholder wants their lawyer to glance at it first, and the lawyer is glancing at several other things ahead of ours.",
+    "The signature is expected on landing, as was the previous one, from the previous flight, that we are trying not to think about.",
+    "Hoxton have asked whether $15M is really enough, a question that would have been more useful several weeks before now.",
+    "TPC are willing to put in new capital, or forgive the old debt, but the plan currently, inconveniently, requires both.",
+    "The structure has been simplified, in that a new and simpler structure has been proposed that everyone now has to re-agree from scratch.",
+    "Hoxton want more certainty on the follow-on round before funding the first tranche, certainty that the first tranche was rather meant to provide.",
+    "The point of disagreement has moved from the valuation to the debt to the timing, and shows every sign of continuing its tour.",
+    "Creativ remain interested, which is the word we've used for Creativ since roughly the start, without visible change in their circumstances.",
+    "Hoxton signed off on the business plan and then asked to see an updated business plan, which they have not yet signed off on.",
+    "TPC's committee is favourable but not confirmed, a distinction we've become painfully expert in over the weeks.",
+    "The tranche sizes have been agreed; the trigger conditions for each tranche have not; the money, accordingly, has not moved.",
+    "Everyone is broadly aligned, which is like being broadly signed, in that it does not, on its own, release any funds.",
+    "The wire has been prepared and is now awaiting a callback verification from the bank, who will call back at a time of the bank's choosing.",
+    "The paying bank wants confirmation in writing before releasing, and the confirmation is awaiting a signature, which is awaiting a flight.",
+    "The funds are with Hoxton's fund administrator, whose release cut-off we have now missed on two separate and instructive occasions.",
+    "The transfer needs two partners to authorise, one of whom is authorising it and one of whom is, at present, on a mountain.",
+    "It's a same-day payment submitted, with characteristic timing, four minutes after the same-day window closed.",
+    "The amount to be wired is confirmed, then unconfirmed, then confirmed as a different amount, in a rhythm we've learned to sway to.",
+    "The remittance advice will follow the payment, the payment will follow the signature, and the signature will follow, we're assured, shortly.",
+    "The account details are being re-verified for a payment this size, a prudence we'd admire more if it weren't happening to us.",
+    "The administrators want the plan to demonstrably improve the position of creditors, and are, reasonably, unmoved by our wishing that it would.",
+    "We're waiting for the administrators to 'call the ball', a phrase that has come to structure our entire week.",
+    "The full filing has to be made by Tuesday, so it can't slip far, in the specific sense that it can slip exactly to Tuesday.",
+    "A representative has to sign the administration papers before a solicitor, so arranging a solicitor, a representative and a shared time zone is now three problems.",
+    "The insolvency practitioners have advised there is still a credible route to funding, which is why we are, gratifyingly and exhaustingly, still here.",
+    "Whether this ends in a rescue or an administration is, as of this update, still genuinely a coin that hasn't landed.",
+    "The administrators are lining up their comms for the filing, the one workstream running visibly ahead of schedule.",
+    "The NOI's moratorium has expired, leaving us in the gap between protections, which is exactly as comfortable as it sounds.",
+    "The board call was quorate, productive and warm, and produced, on the specific question of the money, nothing.",
+    "The committee has requested one more paper, having read the several papers that were meant to preclude requesting one more paper.",
+    "The chair wants the numbers re-presented in a different format, and the different format is, naturally, being prepared overnight.",
+    "It's on the agenda for the next meeting, which is the same place it was on the agenda for the last one.",
+    "The sub-committee that has to approve this meets rarely and, we are learning, unhurriedly.",
+    "The board reached a decision, then agreed to revisit the decision, which is the board equivalent of nearly leaving the house.",
+    "The redlines have gone back and forth so many times the document now has a faint archaeological quality to it.",
+    "A tax opinion is required before completion, and the tax counsel is, as tax counsel tend to be, thorough to the point of geological.",
+    "The disclosure schedule is being reconciled against the warranties, a process that keeps discovering things it then has to reconcile.",
+    "The completion mechanics are agreed in substance and disputed in every particular, which lawyers assure me is both normal and progress.",
+    "Counsel spotted that an old side letter conflicts with the new terms, so an agreement from years ago is now, briefly, the main event.",
+    "The engrossment is with the parties for execution, execution being the step at which, historically, someone turns out to be on a plane.",
+    "The final version is final except for one bracketed figure, and the bracketed figure is the whole reason anyone is doing this.",
+    "New counsel is getting up to speed, a process that is thorough, sensible, and adding precisely the days we don't have.",
+    "Roland has worked on this for two months, unpaid, from an increasing number of airports, and even he cannot make the third investor answer.",
+    "The person who owns the Hoxton relationship is on leave booked long before any of this began, and could not, humanely, be cancelled.",
+    "The decision-maker's assistant says he's 'across it', a phrase that has so far correlated with no observable action.",
+    "The signatory has excellent reasons for the delay, all of them true, none of them money in anyone's account.",
+    "Corey is updating us at 9pm, then 9:30, then 'shortly', in a countdown that only ever counts up.",
+    "Tom has drafted a letter to the board as a director to try to force the process, a sentence whose existence tells you where we are.",
+    "The one colleague who understood the payroll system left in the last round of redundancies, taking the understanding with them.",
+    "The approver is out sick, and nobody, across nine weeks of this, was named as their backup, which is its own kind of update.",
+    "The payslips were released this morning by the provider in error, briefly implying a payment that has not, in fact, occurred.",
+    "We're at eight weeks unpaid, the exact point past which the government scheme stops helping, which is, one assumes, a coincidence of timing.",
+    "July is agreed in principle; August is not yet discussed; September is, quietly, beginning to happen anyway.",
+    "The funding, if it lands, would cover the overdue payroll 'quickly', a word that has done a great deal of unpaid work these past weeks.",
+    "We've been assured the team would be paid the moment funds arrive, which reduces the outstanding problem neatly to the arrival of funds.",
+    "The call needs London, New York and the West Coast, three cities that share, on a good day, about ninety usable minutes.",
+    "The meeting slipped to catch the US, and the US, having been caught, asked to reconvene once they'd caught up.",
+    "It's first thing in London and the middle of the night in California, so we are, once again, awake alone with the problem.",
+    "The decision has to clear a west-coast committee, an east-coast counsel and a London board, in that order, before Friday, in theory.",
+    "We're holding the call until the one attendee in the one time zone that matters is reliably conscious.",
+    "A supplier has issued a statutory demand, which adds, to the money we can't pay, a clock we can't stop.",
+    "HMRC don't need to issue a statutory demand first, a fact that has moved, this week, from footnote to feature.",
+    "AWS invoices are overdue, and the backend may begin switching itself off before the funding switches itself on.",
+    "A winding-up petition would freeze the account and block the very payment we're waiting on, so we are, in effect, racing ourselves.",
+    "The regulatory notification carries a mandatory waiting period, a delay that is, at least, for once, nobody's fault.",
+    "A creditor is threatening action, which we are managing with a mixture of candour and the hope common to all our dealings.",
+    "The diligence list arrived with new questions attached to the answers to the old questions, like a hydra with a data room.",
+    "We submitted the last of the requested materials overnight, and await the requests that experience says the materials will generate.",
+    "The third investor's diligence hasn't formally started, so its length, depth and eventual conclusion remain, encouragingly, entirely unknown.",
+    "The forecast is being re-tweaked to Hoxton's directions, tweaks that have a way of arriving in sets.",
+    "The data room is being 'refreshed', a housekeeping task that keeps landing on the critical path.",
+    "Not a great deal has changed, but the parties are still discussing, and 'still discussing' is, at this point, practically our brand.",
+    "We are pressing for a decision today, one way or the other, as we pressed for a decision yesterday, one way or the other.",
+    "There's a call this evening that should give clarity, a role this evening's call shares with a long line of previous evenings' calls.",
+    "The parties are saying the right things, which would be more reassuring if saying the right things released funds.",
+    "It's positive, on balance, that nobody has walked away, though nobody, on balance, has done anything else either.",
+    "We're cautiously optimistic, a stance we've held so long it has developed load-bearing calluses.",
+    "Progress is being made, though progress, as we keep having to note, is not the same as payment.",
+    "We remain hopeful, an emotion we are rationing carefully to make it last the negotiation.",
+    "The will is there; the way is being drafted; the money, meanwhile, is somewhere between the two.",
+    "Discussions continue, in the way that a horizon continues: reliably present, reliably not arrived at.",
+    "Today's deadline has moved to tomorrow, tomorrow being where all our deadlines eventually retire.",
+    "We were told this was the final call; it was, until a further final call was scheduled after it.",
+    "The wire should follow the signature 'immediately', a word we have watched cover a span of several days without complaint.",
+    "Best case, funds land Monday; realistic case, later; historical case, a Monday we have not yet met.",
+    "The hard stop was Friday, and we have passed it, softly, into a weekend of continued discussion.",
+    "It can't slip past the end of the week, a sentence we have now truthfully said about several different weeks.",
+    "We expect resolution by the morning, and have expected resolution by a number of mornings that would surprise you.",
+    "The signing certificate is on a laptop with a former employee who is himself on holiday, which is delay nested inside delay.",
+    "The courier with the wet-ink documents has been given the wrong building, and is, we're told, circling.",
+    "The e-signature vendor has, with exquisite timing, chosen this week to have an outage of its own.",
+    "The only working printer is behind a door that requires a fob belonging to someone no longer employed here.",
+    "The confirmation was sent to a distribution list deleted in the last reorganisation, so it went, technically, nowhere.",
+    "A calendar decline was misread as an approval, and we are now gently unwinding the good news we briefly had.",
+    "The board pack is 200 pages and was circulated at midnight, so 'reviewed' is, this morning, an aspiration.",
+    "The signatory is at a funeral, which is unarguable, and which we can only note has extended the timeline further.",
+    "The wire was ready and then the bank closed, the bank keeping, unlike this process, entirely normal hours.",
+    "Someone renamed the final file 'FINAL_v3_actualfinal', and we are now, briefly, unsure which final is final.",
+    "Hoxton's committee sits Thursday, TPC's sits Friday, and the deal needs both, so the earliest yes is a yes shaped like next week.",
+    "The lead wants a milestone on the second tranche that we can't hit without the first tranche, which needs the second agreed.",
+    "A co-investor is being sought to sit alongside Hoxton, and co-investors, we are discovering, like to arrive after the risk has left.",
+    "TPC will follow an equity lead but will not lead, and the equity lead is currently a position rather than a person.",
+    "The GP has to clear this with their LPs, whose consent runs on a calendar that predates and outlasts our urgency.",
+    "The investment memo is being redrafted for the committee, the previous memo having answered questions the committee has since replaced.",
+    "The warrant coverage is the final sticking point, warrants being the thing left to argue about once everything real is agreed.",
+    "A director has to recuse on the conflict, which changes the maths on who can actually pass the resolution.",
+    "The written resolution is being recirculated after a name was misspelled, so a typo now sits on the critical path.",
+    "The share subscription agreement is complete but for one exhibit, and the exhibit is with someone who is, of course, travelling.",
+    "We need a fresh board consent because the last one was, on inspection, given for a version of the plan that no longer exists.",
+    "The company can't pay itself until the new entity's bank account is open, and opening it needs approvals we are also waiting on.",
+    "I don't want to give false hope, so I'll say only that discussions are live, which is the smallest true thing I have.",
+    "There's nothing to report, which I'm reporting on schedule so that the absence, at least, arrives punctually.",
+    "We'll update again at midday, or before, or when there is something, whichever of those turns out to be latest.",
+    "The honest position is that it's out of our hands, into hands that are, themselves, waiting on other hands.",
+    "We are doing everything we can, a claim I make with confidence and diminishing evidence of effect.",
+    "The situation is fluid, which is the word one uses when 'stuck' would be more accurate but less survivable.",
+    "I'll keep the updates coming as things happen, on the current understanding that things happening remains optional.",
+    "The lawyers have exchanged another round of comments, each side's comments being, mostly, comments on the other's comments.",
+    "Completion is set for 'end of week', a location that, like the end of a rainbow, recedes as one approaches.",
+    "The funder's compliance team have one more box to tick, small, they assure us, which is what they said about the last box.",
+    "The board wants sight of the redundancy costs before funding, and the redundancy costs depend on the funding, so we chase our own tail again.",
+    "The plan assumes a smaller team going forward, the shape of which is being decided by people also deciding whether there is a going forward.",
+    "We've had verbal agreement from all three parties, verbal agreement being, in this saga, the point just before something goes quiet.",
+    "The term sheet is signed but non-binding, so we have a document expressing everyone's intention to keep discussing.",
+    "The transfer is 'in progress', a status the banking system and this entire company have generously shared for weeks.",
+    "Hoxton have gone quiet since the weekend, and we are interpreting the quiet, optimistically, as diligence rather than departure.",
+    "The IP has to be confirmed clean before funding, and confirming IP clean is a task lawyers can extend approximately forever.",
+    "The board meeting produced a plan to have another board meeting, which is, technically, an output.",
+    "We're waiting on one email from one person, an email whose importance is matched only by its persistent non-arrival.",
+    "The funds exist, the will exists, the documents exist; only their simultaneous existence, so far, does not.",
+    "The revised proposal is really the old proposal with new dates, and the new dates are already, quietly, aging.",
+    "The signature came through, briefly lifting the room, before we noticed it was on the wrong document.",
+    "The approval is 'with the partners', a place documents enter readily and leave on a schedule known only to the partners.",
+    "The deal needs a super-majority, and the last shareholder to make it up is enjoying, at length, being the last shareholder.",
+    "A statutory demand's 21 days are ticking, the one clock in this process that has never once been rescheduled.",
+    "We're told the money will move 'first thing', a first thing that has migrated, over the week, steadily later into the day.",
+    "The counterparty has asked for a short extension to consider, an extension whose shortness is, so far, mostly notional.",
+    "The board resolution needs re-signing after a clause changed, so signatures we already had are, disappointingly, signatures we now need again.",
+    "The wire cleared TPC and is awaiting Hoxton, once more the last name on a document and the last obstacle to a payment.",
+    "The funder's counsel is 'reviewing', a verb that has, in our experience, no reliable relationship with any noun that follows it.",
+    "It's agreed subject to documentation, and documentation, we've learned, is where agreements go to be slowly disagreed with again.",
+    "The one point left is who bears the risk if the follow-on round fails, a question nobody wants to answer and everyone wants settled.",
+    "The plan hinges on Universal Airwave shipping fast, a product timeline now quietly load-bearing for our salaries.",
+    "The investor's committee won't meet before afternoon West Coast time, a sentence I could now recite in my sleep, and probably do.",
+    "We're assured the delay is procedural, not a change of heart, a reassurance that would land better with a date attached.",
+    "The remittance is being prepared, prepared being the stage immediately before the stage where it inexplicably isn't sent.",
+    "The signatory confirmed they'd sign 'tonight', and tonight, in their time zone, retains several more hours in which not to.",
+    "The funding requires a legal opinion that requires a fact that requires a document that is, at present, being drafted.",
+    "We've moved from 'this week' to 'early next week', a migration our deadlines make so smoothly you could almost miss it.",
+    "The bank has the instruction and is 'processing', a state of grace that has now lasted longer than most actual processes.",
+    "TPC conceded the point over the weekend, so we are aligned again, pending the discovery of the next point.",
+    "The lead's final evaluation is 'nearly done', a nearness that has held remarkably steady across several updates.",
+    "The documents are being 'finalised', which is different from finished in ways this process keeps patiently teaching us.",
+    "The shareholder is reachable, willing and available, just not, so far, simultaneously.",
+    "We expect the term sheet back countersigned today, having expected it back countersigned yesterday, from the same fax that owes it to us.",
+    "The board has approved, in principle, raising a further ten million on top of the fifteen, which is more to agree, not less.",
+    "Completion is contingent on a condition that is contingent on a consent that is, itself, mid-negotiation.",
+    "Hoxton want the go-forward budget before releasing, and the go-forward budget waits on decisions about who is going forward.",
+    "The payment is authorised in principle and unauthorised in the actual system that would send it.",
+    "The lawyers have promised a clean version by end of day, a promise now indistinguishable, to us, from weather.",
+    "The final blocker is a single number in a single cell, defended by two parties as though it were the last redoubt.",
+    "There will be a Team Time once we have news, an event we can therefore schedule only by first solving the entire problem.",
+    "The transfer is expected 'imminently', a word this company has worn so smooth it no longer grips anything.",
+    "We are, genuinely, closer than we have ever been, a claim rendered only slightly weaker by how often we've made it."
+  ];
+
+    // Shuffled "bag": deal every excuse exactly once before any can repeat.
+    var bag = [];
+    var lastShown = -1;
+    function refillBag() {
+      bag = excuses.map(function (_, i) { return i; });
+      for (var j = bag.length - 1; j > 0; j--) {        // Fisher-Yates shuffle
+        var k = Math.floor(Math.random() * (j + 1));
+        var t = bag[j]; bag[j] = bag[k]; bag[k] = t;
+      }
+      if (bag.length > 1 && bag[bag.length - 1] === lastShown) {
+        var s = bag[bag.length - 1]; bag[bag.length - 1] = bag[0]; bag[0] = s;
+      }
+    }
+
+    function render(animate) {
+      if (bag.length === 0) refillBag();
+      var i = bag.pop();
+      lastShown = i;
+      var ex = $("excuse");
+      ex.textContent = excuses[i];
+      if (animate) {
+        ex.classList.remove("enter"); void ex.offsetWidth; ex.classList.add("enter");
+      }
+    }
+
+    $("gen").addEventListener("click", function () { render(true); });
+    render(false);
+  })();
+  </script>
+</body>
+</html>
